@@ -4,8 +4,4 @@
 
     <query-dto-list ref="get_groups.sql" dto="GroupEx" method="getGroupsEx" />
 
-    <query-list ref="get_groups.sql" method="getGroupsIds" return-type="int64"/>
-
-    <query ref="get_groups.sql" method="getGroupsId" return-type="int64"/>
-
 </dao-class>

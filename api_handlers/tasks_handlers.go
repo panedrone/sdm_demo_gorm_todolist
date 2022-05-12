@@ -30,8 +30,8 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	tDao := dal.NewTasksDao()
-	tasks, err := tDao.GetGroupTasks(uri.GId)
+	var tasks []dal.TaskEx // https://gorm.io/docs/query.html
+	err := dal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").Find(&tasks).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

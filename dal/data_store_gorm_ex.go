@@ -15,16 +15,13 @@ func (ds *DataStore) initDb() (err error) {
 func Db() *gorm.DB {
 	return ds.db
 }
+
 func OpenDB() error {
 	return ds.Open()
 }
 
 func CloseDB() error {
 	return ds.Close()
-}
-
-func NewTasksDao() *TasksDao {
-	return &TasksDao{Ds: ds}
 }
 
 func NewGroupsDao() *GroupsDao {

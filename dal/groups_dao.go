@@ -25,31 +25,3 @@ func (dao *GroupsDao) GetGroupsEx() (res []*GroupEx, err error) {
 	}
 	return
 }
-
-func (dao *GroupsDao) GetGroupsIds() (res []int64, err error) {
-	sql := `select g.*,  
-		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
-		from groups g`
-	errMap := make(map[string]int)
-	onRow := func(val interface{}) {
-		var data int64
-		fromVal(&data, val, errMap)
-		res = append(res, data)
-	}
-	err = dao.Ds.QueryAll(sql, onRow)
-	if err == nil {
-		err = errMapToErr(errMap)
-	}
-	return
-}
-
-func (dao *GroupsDao) GetGroupsId() (res int64, err error) {
-	sql := `select g.*,  
-		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
-		from groups g`
-	r, err := dao.Ds.Query(sql)
-	if err == nil {
-		err = assign(&res, r)
-	}
-	return
-}
