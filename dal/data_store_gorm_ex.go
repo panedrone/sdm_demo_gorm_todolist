@@ -3,12 +3,15 @@ package dal
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var ds = &DataStore{}
 
 func (ds *DataStore) initDb() (err error) {
-	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{})
+	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	return
 }
 
