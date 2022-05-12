@@ -46,7 +46,7 @@ func GroupUpdateHandler(ctx *gin.Context) {
 		return
 	}
 	gr := dal.Group{GId: uri.GId}
-	err = dal.Db().First(&gr).Error
+	err = dal.Db().Take(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -79,7 +79,7 @@ func ReturnGroupHandler(ctx *gin.Context) {
 		return
 	}
 	gr := dal.Group{GId: uri.GId}
-	err := dal.Db().First(&gr).Error
+	err := dal.Db().Take(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

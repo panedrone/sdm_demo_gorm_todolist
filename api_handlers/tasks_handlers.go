@@ -16,7 +16,7 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		return
 	}
 	currTask := dal.Task{TId: inTsk.TId}
-	err = dal.Db().First(&currTask).Error
+	err = dal.Db().Take(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -107,7 +107,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		return
 	}
 	t := dal.Task{TId: inTsk.TId}
-	err = dal.Db().First(&t).Error
+	err = dal.Db().Take(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
