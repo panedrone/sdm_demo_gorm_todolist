@@ -30,8 +30,10 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	var tasks []dal.TaskEx // https://gorm.io/docs/query.html
-	err := dal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").Find(&tasks).Error
+	// don't fetch comments for list:
+	var tasks []dal.Task // https://gorm.io/docs/query.html
+	err := dal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
+		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

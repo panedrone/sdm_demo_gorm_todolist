@@ -12,8 +12,4 @@
 
     <dto-class name="gorm-Task" ref="tasks"/>
 
-    <dto-class name="gorm-TaskEx" ref="tasks">
-        <field column="t_comments" type="string"/> <!-- don't fetch them for list -->
-    </dto-class>
-
 </dto-classes>
