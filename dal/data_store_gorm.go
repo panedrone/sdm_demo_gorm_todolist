@@ -14,7 +14,7 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement the class _DS for Go + GORM.
+   This is an example of how to implement DataStore for Go + GORM.
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sqldalmaker@gmail.com
