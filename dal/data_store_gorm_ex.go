@@ -6,9 +6,9 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var ds = &DataStore{}
+var ds = &_DS{}
 
-func (ds *DataStore) initDb() (err error) {
+func (ds *_DS) initDb() (err error) {
 	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
@@ -28,5 +28,5 @@ func CloseDB() error {
 }
 
 func NewGroupsDao() *GroupsDao {
-	return &GroupsDao{Ds: ds}
+	return &GroupsDao{ds: ds}
 }

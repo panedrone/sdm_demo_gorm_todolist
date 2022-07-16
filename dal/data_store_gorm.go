@@ -14,11 +14,27 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement the class DataStore for Go + GORM.
+   This is an example of how to implement the class _DS for Go + GORM.
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sqldalmaker@gmail.com
 */
+
+type DataStore interface {
+	Open() (err error)
+	Close() (err error)
+
+	Begin() (err error)
+	Commit() (err error)
+	Rollback() (err error)
+
+	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
+	Exec(sqlStr string, args ...interface{}) (res int64, err error)
+	Query(sqlStr string, args ...interface{}) (arr interface{}, err error)
+	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
+	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
+	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+}
 
 type OutParam struct {
 	/*
@@ -45,21 +61,21 @@ type InOutParam struct {
 	Dest interface{}
 }
 
-type DataStore struct {
+type _DS struct {
 	paramPrefix string
-	db          *gorm.DB // public
+	db          *gorm.DB
 	tx          *gorm.DB
 }
 
-func (ds *DataStore) isPostgreSQL() bool {
+func (ds *_DS) isPostgreSQL() bool {
 	return ds.paramPrefix == "$"
 }
 
-func (ds *DataStore) isOracle() bool {
+func (ds *_DS) isOracle() bool {
 	return ds.paramPrefix == ":"
 }
 
-func (ds *DataStore) isSqlServer() bool {
+func (ds *_DS) isSqlServer() bool {
 	return ds.paramPrefix == "@p"
 }
 
@@ -73,18 +89,22 @@ package dal
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-var ds = &DataStore{}
+var ds = &_DS{}
 
-func (ds *DataStore) initDb() (err error) {
-	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{})
+func (ds *_DS) initDb() (err error) {
+	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	return
 }
 
 func Db() *gorm.DB {
 	return ds.db
 }
+
 func OpenDB() error {
 	return ds.Open()
 }
@@ -93,26 +113,22 @@ func CloseDB() error {
 	return ds.Close()
 }
 
-func NewTasksDao() *TasksDao {
-	return &TasksDao{Ds: ds}
-}
-
 func NewGroupsDao() *GroupsDao {
-	return &GroupsDao{Ds: ds}
+	return &GroupsDao{ds: ds}
 }
 
 */
 
-func (ds *DataStore) Open() error {
+func (ds *_DS) Open() error {
 	return ds.initDb()
 }
 
-func (ds *DataStore) Close() (err error) {
+func (ds *_DS) Close() (err error) {
 	// ds.db.Close() // TODO
 	return
 }
 
-func (ds *DataStore) Begin() (err error) {
+func (ds *_DS) Begin() (err error) {
 	if ds.tx != nil {
 		return errors.New("ds.tx already started")
 	}
@@ -120,7 +136,7 @@ func (ds *DataStore) Begin() (err error) {
 	return
 }
 
-func (ds *DataStore) Commit() (err error) {
+func (ds *_DS) Commit() (err error) {
 	if ds.tx == nil {
 		return errors.New("ds.tx not started")
 	}
@@ -129,7 +145,7 @@ func (ds *DataStore) Commit() (err error) {
 	return
 }
 
-func (ds *DataStore) Rollback() (err error) {
+func (ds *_DS) Rollback() (err error) {
 	if ds.tx == nil {
 		return nil // commit() was called, just do nothing:
 	}
@@ -138,7 +154,7 @@ func (ds *DataStore) Rollback() (err error) {
 	return
 }
 
-func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
+func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	var raw *gorm.DB
 	if ds.tx == nil {
 		raw = ds.db.Raw(sqlStr, args...)
@@ -149,7 +165,7 @@ func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, erro
 	return raw.Rows()
 }
 
-func (ds *DataStore) _exec(sqlStr string, args ...interface{}) error {
+func (ds *_DS) _exec(sqlStr string, args ...interface{}) error {
 	if ds.tx == nil { // TODO no sql.Result
 		return ds.db.Exec(sqlStr, args...).Error
 	} else {
@@ -157,11 +173,11 @@ func (ds *DataStore) _exec(sqlStr string, args ...interface{}) error {
 	}
 }
 
-func (ds *DataStore) PGFetch(cursor string) string {
+func (ds *_DS) PGFetch(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
-func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr += " RETURNING " + aiNames
 	rows, err := ds._query(sqlStr, args...)
@@ -180,7 +196,7 @@ func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{
 	return
 }
 
-func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr = fmt.Sprintf("%s returning %s  into :%d", sqlStr, aiNames, len(args)+1)
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
@@ -196,7 +212,7 @@ func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interf
 	return id64, nil
 }
 
-func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
@@ -219,7 +235,7 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) (id interf
 	return
 }
 
-//func (ds *DataStore) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
+//func (ds *_DS) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
 //	//res, err := ds._exec(sqlStr, args...)
 //	//if err != nil {
 //	//	return
@@ -230,9 +246,9 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) (id interf
 //	return
 //}
 
-func (ds *DataStore) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	if len(aiNames) == 0 { // len(nil) == 0
-		err = errors.New("DataStore.insert is not applicable for aiNames = " + aiNames)
+		err = errors.New("_DS.insert is not applicable for aiNames = " + aiNames)
 		return
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
@@ -276,7 +292,7 @@ func _validateDest(dest interface{}) (err error) {
 	return
 }
 
-func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
+func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
 	queryArgs *[]interface{}) (implicitCursors bool, outCursors bool, err error) {
 	implicitCursors = false
 	outCursors = false
@@ -342,7 +358,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 	return
 }
 
-func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -378,7 +394,7 @@ func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(ma
 	return
 }
 
-func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -412,7 +428,7 @@ func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map
 	return
 }
 
-func (ds *DataStore) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
+func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
 	err = ds._exec(sqlStr, args...)
 	if err != nil {
 		return
@@ -463,7 +479,7 @@ func _fetchAllFromCursor(rows driver.Rows, onRow func(map[string]interface{})) (
 	return
 }
 
-func (ds *DataStore) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
+func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
@@ -483,7 +499,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) (res int64, err er
 	return ds._exec2(sqlStr, onRowArr, queryArgs...)
 }
 
-func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
+func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -520,7 +536,7 @@ func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (v
 	return
 }
 
-func (ds *DataStore) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
+func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
@@ -536,7 +552,7 @@ func (ds *DataStore) Query(sqlStr string, args ...interface{}) (arr interface{},
 	return // it returns []interface{} for cases like 'SELECT @value, @name;'
 }
 
-func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -571,7 +587,7 @@ func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...in
 	return
 }
 
-func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
+func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -602,7 +618,7 @@ func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) (data map[stri
 	return
 }
 
-func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlStr = ds._formatSQL(sqlStr)
@@ -639,12 +655,12 @@ func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface
 
 /*
 // MySQL: if string is ok for all types (no conversions needed), use this:
-func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+func (ds *_DS) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
 	// ...
 	values := make([]string, len(colNames))
 }
 */
-func (ds *DataStore) _prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
+func (ds *_DS) _prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {
 		return
@@ -661,7 +677,7 @@ func (ds *DataStore) _prepareFetch(rows *sql.Rows) (colNames []string, data map[
 	return
 }
 
-func (ds *DataStore) _formatSQL(sqlStr string) string {
+func (ds *_DS) _formatSQL(sqlStr string) string {
 	if len(ds.paramPrefix) == 0 {
 		return sqlStr
 	}

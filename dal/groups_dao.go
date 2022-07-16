@@ -4,7 +4,7 @@ package dal
 // http://sqldalmaker.sourceforge.net
 
 type GroupsDao struct {
-	Ds *DataStore
+	ds DataStore
 }
 
 func (dao *GroupsDao) GetGroupsEx() (res []*GroupEx, err error) {
@@ -19,7 +19,7 @@ func (dao *GroupsDao) GetGroupsEx() (res []*GroupEx, err error) {
 		fromRow(&obj.TasksCount, row, "tasks_count", errMap)
 		res = append(res, &obj)
 	}
-	err = dao.Ds.QueryAllRows(sql, onDto)
+	err = dao.ds.QueryAllRows(sql, onDto)
 	if err == nil {
 		err = errMapToErr(errMap)
 	}
