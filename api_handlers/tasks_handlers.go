@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sdm_demo_go_todolist/dal"
+	"sdm_demo_go_todolist/dal/dao"
 	"time"
 )
 
@@ -16,7 +17,7 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		return
 	}
 	currTask := dal.Task{TId: inTsk.TId}
-	err = dal.Db().Take(&currTask).Error
+	err = dao.Db().Take(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -32,7 +33,7 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 	}
 	// don't fetch comments for list:
 	var tasks []dal.Task // https://gorm.io/docs/query.html
-	err := dal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
+	err := dao.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
 		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -60,7 +61,7 @@ func TaskCreateHandler(ctx *gin.Context) {
 	currentTime := time.Now().Local()
 	layoutISO := currentTime.Format("2006-01-02")
 	t.TDate = layoutISO
-	err = dal.Db().Create(&t).Error
+	err = dao.Db().Create(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -75,7 +76,7 @@ func TaskDeleteHandler(ctx *gin.Context) {
 		return
 	}
 	currTask := dal.Task{TId: inTsk.TId}
-	err = dal.Db().Delete(&currTask).Error
+	err = dao.Db().Delete(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -109,7 +110,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		return
 	}
 	t := dal.Task{TId: inTsk.TId}
-	err = dal.Db().Take(&t).Error
+	err = dao.Db().Take(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -118,7 +119,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 	t.TPriority = inTask.TPriority
 	t.TDate = inTask.TDate
 	t.TComments = inTask.TComments
-	err = dal.Db().Save(&t).Error
+	err = dao.Db().Save(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

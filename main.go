@@ -4,17 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"sdm_demo_go_todolist/api_handlers"
-	"sdm_demo_go_todolist/dal"
+	"sdm_demo_go_todolist/dal/dao"
 )
 
 func main() {
-	err := dal.OpenDB()
+	err := dao.OpenDB()
 	if err != nil {
 		println(err.Error())
 		return
 	}
 	defer func() {
-		err = dal.CloseDB()
+		err = dao.CloseDB()
 	}()
 
 	gin.SetMode(gin.ReleaseMode)

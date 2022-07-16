@@ -1,4 +1,4 @@
-package dal
+package dao
 
 import (
 	"gorm.io/driver/sqlite"

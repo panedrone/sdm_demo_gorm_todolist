@@ -1,4 +1,4 @@
-package dal
+package dao
 
 import (
 	"database/sql"
@@ -80,7 +80,7 @@ func (ds *_DS) isSqlServer() bool {
 }
 
 /*
-	Locate the method initDb() in an external file. This is an example:
+	Implement the method initDb(ds *_DS) in an external file. This is an example:
 
 // data_store_gorm_ex.go
 
