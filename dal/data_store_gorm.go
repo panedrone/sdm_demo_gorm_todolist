@@ -30,7 +30,7 @@ type DataStore interface {
 
 	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
 	Exec(sqlStr string, args ...interface{}) (res int64, err error)
-	Query(sqlStr string, args ...interface{}) (arr interface{}, err error)
+	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
 	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
 	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
 	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
