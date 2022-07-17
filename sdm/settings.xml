@@ -19,8 +19,6 @@
 
     <type-map default="">
 
-        <!-- Example for Go and MySQL|SQLite3: -->
-
         <type detected="gorm-java.lang.Short" target="int32${json-gorm}"/>
         <type detected="gorm-java.lang.Integer" target="int64${json-gorm}"/>
         <type detected="gorm-java.lang.String" target="string${json-gorm}"/>
@@ -46,28 +44,17 @@
 
     <macros>
 
-        <!-- =built-in= is a key-word -->
-
         <macro name="${column}" value="=built-in="/>
         <macro name="${lower_snake_case(column)}" value="=built-in="/>
         <macro name="${camelCase(column)}" value="=built-in="/>
         <macro name="${TitleCase(column)}" value="=built-in="/>
         <macro name="${kebab-case(column)}" value="=built-in="/>
 
-        <!-- go json tags: -->
-
         <macro name="${col}" value="${lower_snake_case(column)}"/>
-
         <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
-
-        <macro name="${json-gorm}"
-               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
-
+        <macro name="${json-gorm}" value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
 
         <macro name="${gorm-params}">
-
-            <!-- https://developpaper.com/getting-started-with-gorm/-->
-
             <vm-xml>
                 <if var="$fi.PK">
                     <print var=";primary_key"/>
