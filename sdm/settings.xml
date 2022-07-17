@@ -4,9 +4,9 @@
 
     <folders target="dal" sql="sdm/sql"/>
 
-    <dto scope="sdm_demo_go_todolist/dal" inheritance="" field-names-mode="0" macro=""/>
+    <dto scope="sdm_demo_gorm_todolist/dal" inheritance="" field-names-mode="0" macro=""/>
 
-    <dao scope="sdm_demo_go_todolist/dal/dao" macro=""/>
+    <dao scope="sdm_demo_gorm_todolist/dal/dao" macro=""/>
 
     <external-vm-file path=""/>
 

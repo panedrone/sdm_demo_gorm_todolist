@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"sdm_demo_go_todolist/api_handlers"
-	"sdm_demo_go_todolist/dal/dao"
+	"sdm_demo_gorm_todolist/api_handlers"
+	"sdm_demo_gorm_todolist/dal/dao"
 )
 
 func main() {

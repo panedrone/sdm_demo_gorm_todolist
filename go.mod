@@ -1,4 +1,4 @@
-module sdm_demo_go_todolist
+module sdm_demo_gorm_todolist
 
 go 1.17
 

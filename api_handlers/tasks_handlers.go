@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sdm_demo_go_todolist/dal"
-	"sdm_demo_go_todolist/dal/dao"
+	"sdm_demo_gorm_todolist/dal"
+	"sdm_demo_gorm_todolist/dal/dao"
 	"time"
 )
 
