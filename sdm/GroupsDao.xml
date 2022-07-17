@@ -2,6 +2,6 @@
 <dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="dao.xsd">
 
-    <query-dto-list ref="get_groups.sql" dto="GroupEx" method="getGroupsEx" />
+    <query-dto-list method="getGroupsEx" dto="GroupEx" />
 
 </dao-class>
