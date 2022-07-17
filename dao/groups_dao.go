@@ -4,20 +4,20 @@ package dao
 // http://sqldalmaker.sourceforge.net
 
 import (
-	"sdm_demo_gorm_todolist/dal"
+	"sdm_demo_gorm_todolist/models"
 )
 
 type GroupsDao struct {
 	ds DataStore
 }
 
-func (dao *GroupsDao) GetGroupsEx() (res []*dal.GroupEx, err error) {
+func (dao *GroupsDao) GetGroupsEx() (res []*models.GroupEx, err error) {
 	sql := `select g.*,  
 		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
 		from groups g`
 	errMap := make(map[string]int)
 	onDto := func(row map[string]interface{}) {
-		obj := dal.GroupEx{}
+		obj := models.GroupEx{}
 		fromRow(&obj.GId, row, "g_id", errMap)
 		fromRow(&obj.GName, row, "g_name", errMap)
 		fromRow(&obj.TasksCount, row, "tasks_count", errMap)

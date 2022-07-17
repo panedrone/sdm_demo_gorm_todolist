@@ -84,7 +84,7 @@ func (ds *_DS) isSqlServer() bool {
 
 // data_store_gorm_ex.go
 
-package dal
+package models
 
 import (
 	"gorm.io/driver/sqlite"

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sdm_demo_gorm_todolist/dal"
-	"sdm_demo_gorm_todolist/dal/dao"
+	"sdm_demo_gorm_todolist/dao"
+	"sdm_demo_gorm_todolist/models"
 )
 
 func GroupCreateHandler(ctx *gin.Context) {
@@ -15,7 +15,7 @@ func GroupCreateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	gr := dal.Group{}
+	gr := models.Group{}
 	gr.GName = inGr.GName
 	err = dao.Db().Create(&gr).Error
 	if err != nil {
@@ -40,13 +40,13 @@ func GroupUpdateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	var inGroup dal.Group
+	var inGroup models.Group
 	err := ctx.ShouldBindJSON(&inGroup)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	gr := dal.Group{GId: uri.GId}
+	gr := models.Group{GId: uri.GId}
 	err = dao.Db().Take(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -66,7 +66,7 @@ func GroupDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	gr := dal.Group{GId: uri.GId}
+	gr := models.Group{GId: uri.GId}
 	err := dao.Db().Delete(&gr).Error // https://gorm.io/docs/delete.html
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -79,7 +79,7 @@ func ReturnGroupHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	gr := dal.Group{GId: uri.GId}
+	gr := models.Group{GId: uri.GId}
 	err := dao.Db().Take(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())

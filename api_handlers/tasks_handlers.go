@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sdm_demo_gorm_todolist/dal"
-	"sdm_demo_gorm_todolist/dal/dao"
+	"sdm_demo_gorm_todolist/dao"
+	"sdm_demo_gorm_todolist/models"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	currTask := dal.Task{TId: inTsk.TId}
+	currTask := models.Task{TId: inTsk.TId}
 	err = dao.Db().Take(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -32,7 +32,7 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		return
 	}
 	// don't fetch comments for list:
-	var tasks []dal.Task // https://gorm.io/docs/query.html
+	var tasks []models.Task // https://gorm.io/docs/query.html
 	err := dao.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
 		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
 	if err != nil {
@@ -48,13 +48,13 @@ func TaskCreateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	var inTask dal.Task
+	var inTask models.Task
 	err := ctx.ShouldBindJSON(&inTask)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	t := dal.Task{}
+	t := models.Task{}
 	t.GId = uri.GId
 	t.TSubject = inTask.TSubject
 	t.TPriority = 1
@@ -75,7 +75,7 @@ func TaskDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	currTask := dal.Task{TId: inTsk.TId}
+	currTask := models.Task{TId: inTsk.TId}
 	err = dao.Db().Delete(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -90,7 +90,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	var inTask dal.Task
+	var inTask models.Task
 	err = ctx.ShouldBindJSON(&inTask)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
@@ -109,7 +109,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid Priority: %d", inTask.TPriority))
 		return
 	}
-	t := dal.Task{TId: inTsk.TId}
+	t := models.Task{TId: inTsk.TId}
 	err = dao.Db().Take(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
