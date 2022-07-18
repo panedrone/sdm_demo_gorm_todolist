@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"database/sql"

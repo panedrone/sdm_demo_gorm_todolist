@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
-	"sdm_demo_gorm_todolist/dao"
+	"sdm_demo_gorm_todolist/dbal"
 	"sdm_demo_gorm_todolist/models"
 )
 
@@ -18,7 +18,7 @@ func GroupCreateHandler(ctx *gin.Context) {
 	}
 	gr := models.Group{}
 	gr.GName = inGr.GName
-	err = dao.Db().Create(&gr).Error
+	err = dbal.Db().Create(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -26,7 +26,7 @@ func GroupCreateHandler(ctx *gin.Context) {
 }
 
 func ReturnAllGroupsHandler(ctx *gin.Context) {
-	grDao := dao.NewGroupsDao()
+	grDao := dbal.NewGroupsDao()
 	groups, err := grDao.GetGroupsEx()
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -48,13 +48,13 @@ func GroupUpdateHandler(ctx *gin.Context) {
 		return
 	}
 	gr := models.Group{GId: uri.GId}
-	err = dao.Db().Take(&gr).Error
+	err = dbal.Db().Take(&gr).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
 	}
 	gr.GName = inGroup.GName
-	err = dao.Db().Save(&gr).Error // https://gorm.io/docs/update.html
+	err = dbal.Db().Save(&gr).Error // https://gorm.io/docs/update.html
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -68,7 +68,7 @@ func GroupDeleteHandler(ctx *gin.Context) {
 		return
 	}
 	gr := models.Group{GId: uri.GId}
-	err := dao.Db().Delete(&gr).Error // https://gorm.io/docs/delete.html
+	err := dbal.Db().Delete(&gr).Error // https://gorm.io/docs/delete.html
 	if err != nil {
 		respondWith500(ctx, err.Error())
 	}
@@ -81,7 +81,7 @@ func ReturnGroupHandler(ctx *gin.Context) {
 		return
 	}
 	group := models.Group{GId: uri.GId}
-	err := dao.Db().Take(&group).Error
+	err := dbal.Db().Take(&group).Error
 	if err == gorm.ErrRecordNotFound {
 		respondWithNotFoundError(ctx, err.Error())
 	} else if err != nil {

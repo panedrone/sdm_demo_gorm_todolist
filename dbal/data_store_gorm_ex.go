@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"gorm.io/driver/sqlite"

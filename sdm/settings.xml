@@ -6,7 +6,7 @@
 
     <dto scope="sdm_demo_gorm_todolist/models" inheritance="" field-names-mode="0" macro=""/>
 
-    <dao scope="sdm_demo_gorm_todolist/dao" macro=""/>
+    <dao scope="sdm_demo_gorm_todolist/dbal" macro=""/>
 
     <external-vm-file path=""/>
 

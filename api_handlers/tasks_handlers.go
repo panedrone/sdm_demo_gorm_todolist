@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
-	"sdm_demo_gorm_todolist/dao"
+	"sdm_demo_gorm_todolist/dbal"
 	"sdm_demo_gorm_todolist/models"
 	"time"
 )
@@ -18,7 +18,7 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		return
 	}
 	task := models.Task{TId: inTsk.TId}
-	err = dao.Db().Take(&task).Error
+	err = dbal.Db().Take(&task).Error
 	if err == gorm.ErrRecordNotFound {
 		respondWithNotFoundError(ctx, err.Error())
 	} else if err != nil {
@@ -36,7 +36,7 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 	}
 	// don't fetch comments for list:
 	var tasks []models.Task // https://gorm.io/docs/query.html
-	err := dao.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
+	err := dbal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
 		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
@@ -64,7 +64,7 @@ func TaskCreateHandler(ctx *gin.Context) {
 	currentTime := time.Now().Local()
 	layoutISO := currentTime.Format("2006-01-02")
 	t.TDate = layoutISO
-	err = dao.Db().Create(&t).Error
+	err = dbal.Db().Create(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -79,7 +79,7 @@ func TaskDeleteHandler(ctx *gin.Context) {
 		return
 	}
 	currTask := models.Task{TId: inTsk.TId}
-	err = dao.Db().Delete(&currTask).Error
+	err = dbal.Db().Delete(&currTask).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -113,7 +113,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		return
 	}
 	t := models.Task{TId: inTsk.TId}
-	err = dao.Db().Take(&t).Error
+	err = dbal.Db().Take(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -122,7 +122,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 	t.TPriority = inTask.TPriority
 	t.TDate = inTask.TDate
 	t.TComments = inTask.TComments
-	err = dao.Db().Save(&t).Error
+	err = dbal.Db().Save(&t).Error
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
