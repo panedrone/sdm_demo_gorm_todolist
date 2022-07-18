@@ -4,11 +4,9 @@
 
     <folders target="" sql="sdm/sql"/>
 
-    <dto scope="sdm_demo_gorm_todolist/models" inheritance="" field-names-mode="0" macro=""/>
+    <dto scope="sdm_demo_gorm_todolist/models" inheritance="" field-names-mode="0" macro="sdm/gorm.vm"/>
 
-    <dao scope="sdm_demo_gorm_todolist/dbal" macro=""/>
-
-    <external-vm-file path=""/>
+    <dao scope="sdm_demo_gorm_todolist/dbal" macro="sdm/gorm.vm"/>
 
     <ide event-log="true"/>
 
