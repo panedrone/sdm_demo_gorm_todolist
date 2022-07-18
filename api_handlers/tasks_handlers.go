@@ -3,6 +3,7 @@ package api_handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"sdm_demo_gorm_todolist/dao"
 	"sdm_demo_gorm_todolist/models"
@@ -16,13 +17,15 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	currTask := models.Task{TId: inTsk.TId}
-	err = dao.Db().Take(&currTask).Error
-	if err != nil {
+	task := models.Task{TId: inTsk.TId}
+	err = dao.Db().Take(&task).Error
+	if err == gorm.ErrRecordNotFound {
+		respondWithNotFoundError(ctx, err.Error())
+	} else if err != nil {
 		respondWith500(ctx, err.Error())
-		return
+	} else {
+		respondWithJSON(ctx, http.StatusOK, task)
 	}
-	ctx.JSON(http.StatusOK, currTask)
 }
 
 func ReturnGroupTasksHandler(ctx *gin.Context) {
@@ -39,7 +42,7 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		respondWith500(ctx, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, tasks)
+	respondWithJSON(ctx, http.StatusOK, tasks)
 }
 
 func TaskCreateHandler(ctx *gin.Context) {

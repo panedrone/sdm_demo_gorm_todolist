@@ -3,6 +3,7 @@ package api_handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"sdm_demo_gorm_todolist/dao"
 	"sdm_demo_gorm_todolist/models"
@@ -31,7 +32,7 @@ func ReturnAllGroupsHandler(ctx *gin.Context) {
 		respondWith500(ctx, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, groups)
+	respondWithJSON(ctx, http.StatusOK, groups)
 }
 
 func GroupUpdateHandler(ctx *gin.Context) {
@@ -79,11 +80,13 @@ func ReturnGroupHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	gr := models.Group{GId: uri.GId}
-	err := dao.Db().Take(&gr).Error
-	if err != nil {
+	group := models.Group{GId: uri.GId}
+	err := dao.Db().Take(&group).Error
+	if err == gorm.ErrRecordNotFound {
+		respondWithNotFoundError(ctx, err.Error())
+	} else if err != nil {
 		respondWith500(ctx, err.Error())
-		return
+	} else {
+		respondWithJSON(ctx, http.StatusOK, group)
 	}
-	ctx.JSON(http.StatusOK, gr)
 }

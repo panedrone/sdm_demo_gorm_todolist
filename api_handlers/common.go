@@ -17,8 +17,16 @@ type taskUri struct {
 	TId int64 `uri:"t_id" binding:"required"`
 }
 
+type Err struct {
+	Error string `json:"error"`
+}
+
 func respondWithBadRequestError(ctx *gin.Context, message string) {
 	respondWithError(ctx, http.StatusBadRequest, message)
+}
+
+func respondWithNotFoundError(ctx *gin.Context, message string) {
+	respondWithError(ctx, http.StatusNotFound, message)
 }
 
 func respondWith500(ctx *gin.Context, message string) {
@@ -26,14 +34,10 @@ func respondWith500(ctx *gin.Context, message string) {
 }
 
 func respondWithError(ctx *gin.Context, httpStatusCode int, message string) {
-	msg := map[string]interface{}{
-		"error": message,
+	err := Err{
+		Error: message,
 	}
-	respondWithErrorMap(ctx, httpStatusCode, msg)
-}
-
-func respondWithErrorMap(ctx *gin.Context, httpStatusCode int, msg map[string]interface{}) {
-	respondWithJSON(ctx, httpStatusCode, msg)
+	respondWithJSON(ctx, httpStatusCode, err)
 }
 
 func respondWithJSON(ctx *gin.Context, httpStatusCode int, jsonObject interface{}) {
