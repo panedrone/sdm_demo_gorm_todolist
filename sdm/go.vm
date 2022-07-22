@@ -199,7 +199,6 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 ## ====================================================================================================================
 #elseif($mode=="dao_exec_dml")
-#if(${dto_param} != "")
 
 #if($method_type == "CREATE")
 // (C)RUD: ${table_name}
@@ -210,6 +209,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 // Returns the number of affected rows or -1 on error.
 
+#if(${dto_param} != "")
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (res int64, err error) {
 #if($crud && $model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
@@ -223,18 +223,7 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #end	
 	return
 }
-#end
-#if($plain_params)
-
-#if($method_type == "CREATE")
-// (C)RUD: ${table_name}
-#elseif($method_type == "UPDATE")
-// CR(U)D: ${table_name}
-#elseif($method_type == "DELETE")
-// CRU(D): ${table_name}
-#end
-// Returns the number of affected rows or -1 on error.
-
+#else ## ---------- not-dto params ----------------------
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res int64, err error) {
 #if($crud && $model != "")
 	p := &${dto_param_type}{
