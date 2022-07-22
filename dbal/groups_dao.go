@@ -36,7 +36,7 @@ func (dao *GroupsDao) Read(gId int64) (res *models.Group, err error) {
 // Returns the number of affected rows or -1 on error.
 
 func (dao *GroupsDao) Update(p *models.Group) (res int64, err error) {
-	res, err = dao.ds.Update(p)
+    res, err = dao.ds.Update(p)
 	return
 }
 
@@ -47,7 +47,7 @@ func (dao *GroupsDao) Delete(gId int64) (res int64, err error) {
 	p := &models.Group{
 		GId: gId,
 	}
-	res, err = dao.ds.Delete(p)
+    res, err = dao.ds.Delete(p)
 	return
 }
 

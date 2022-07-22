@@ -36,7 +36,7 @@ func (dao *TasksDao) ReadTask(tId int64) (res *models.Task, err error) {
 // Returns the number of affected rows or -1 on error.
 
 func (dao *TasksDao) UpdateTask(p *models.Task) (res int64, err error) {
-	res, err = dao.ds.Update(p)
+    res, err = dao.ds.Update(p)
 	return
 }
 
@@ -47,6 +47,6 @@ func (dao *TasksDao) DeleteTask(tId int64) (res int64, err error) {
 	p := &models.Task{
 		TId: tId,
 	}
-	res, err = dao.ds.Delete(p)
+    res, err = dao.ds.Delete(p)
 	return
 }
