@@ -13,14 +13,14 @@ type GroupsDao struct {
 // Generated values are passed to DTO/model.
 
 func (dao *GroupsDao) Create(p *models.Group) (err error) {
-	err = dao.ds.Db().Create(p).Error
+	err = dao.ds.Create(p)
 	return
 }
 
 // C(R)UD: groups
 
 func (dao *GroupsDao) ReadAll() (res []*models.Group, err error) {
-	err = dao.ds.Db().Find(res).Error
+	err = dao.ds.Read(res)
 	return
 }
 
@@ -28,7 +28,7 @@ func (dao *GroupsDao) ReadAll() (res []*models.Group, err error) {
 
 func (dao *GroupsDao) Read(gId int64) (res *models.Group, err error) {
 	res = &models.Group{}
-	err = dao.ds.Db().Take(res, gId).Error
+	err = dao.ds.Read(res, gId)
 	return
 }
 
@@ -36,9 +36,7 @@ func (dao *GroupsDao) Read(gId int64) (res *models.Group, err error) {
 // Returns the number of affected rows or -1 on error.
 
 func (dao *GroupsDao) Update(p *models.Group) (res int64, err error) {
-	db := dao.ds.Db().Save(p)
-	err = db.Error
-	res = db.RowsAffected
+	res, err = dao.ds.Update(p)
 	return
 }
 
@@ -49,9 +47,7 @@ func (dao *GroupsDao) Delete(gId int64) (res int64, err error) {
 	p := &models.Group{
 		GId: gId,
 	}
-	db := dao.ds.Db().Delete(p)
-	err = db.Error
-	res = db.RowsAffected
+	res, err = dao.ds.Delete(p)
 	return
 }
 

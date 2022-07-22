@@ -30,6 +30,16 @@ type DataStore interface {
 	Commit() (err error)
 	Rollback() (err error)
 
+	// CRUD
+
+	Create(dataObjRef interface{}) (err error)
+	ReadAll(sliceOfDataObjRef interface{}) (err error)
+	Read(dataObjRef interface{}, pk ...interface{}) (err error)
+	Update(dataObjRef interface{}) (RowsAffected int64, err error)
+	Delete(dataObjRef interface{}) (RowsAffected int64, err error)
+
+	// raw-SQL
+
 	Exec(sqlStr string, args ...interface{}) (res int64, err error)
 	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
 	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
@@ -158,6 +168,36 @@ func (ds *_DS) Rollback() (err error) {
 	ds.tx = nil
 	return
 }
+
+// CRUD -----------------------------------
+
+func (ds *_DS) Create(dataObjRef interface{}) error {
+	return ds.db.Create(dataObjRef).Error
+}
+
+func (ds *_DS) ReadAll(sliceOfDataObjRef interface{}) error {
+	return ds.db.Find(sliceOfDataObjRef).Error
+}
+
+func (ds *_DS) Read(dataObjRef interface{}, pk ...interface{}) error {
+	return ds.db.Take(dataObjRef, pk...).Error
+}
+
+func (ds *_DS) Update(dataObjRef interface{}) (RowsAffected int64, err error) {
+	db := ds.db.Save(dataObjRef)
+	err = db.Error
+	RowsAffected = db.RowsAffected
+	return
+}
+
+func (ds *_DS) Delete(dataObjRef interface{}) (RowsAffected int64, err error) {
+	db := ds.db.Delete(dataObjRef)
+	err = db.Error
+	RowsAffected = db.RowsAffected
+	return
+}
+
+// raw-SQL --------------------------------
 
 func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	var raw *gorm.DB
