@@ -35,16 +35,16 @@ func (dao *GroupsDao) Read(gId int64) (res *models.Group, err error) {
 // CR(U)D: groups
 // Returns the number of affected rows or -1 on error.
 
-func (dao *GroupsDao) Update(p *models.Group) (res int64, err error) {
-	res, err = dao.ds.Update("groups", p)
+func (dao *GroupsDao) Update(p *models.Group) (rowsAffected int64, err error) {
+	rowsAffected, err = dao.ds.Update("groups", p)
 	return
 }
 
 // CRU(D): groups
 // Returns the number of affected rows or -1 on error.
 
-func (dao *GroupsDao) Delete(p *models.Group) (res int64, err error) {
-	res, err = dao.ds.Delete("groups", p)
+func (dao *GroupsDao) Delete(p *models.Group) (rowsAffected int64, err error) {
+	rowsAffected, err = dao.ds.Delete("groups", p)
 	return
 }
 

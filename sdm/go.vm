@@ -117,7 +117,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 		res = append(res, &obj)
 	}
-#if(${dto_param} != "")	
+#if(${dto_param} != "")
 	err = dao.ds.QueryAllRows(sql, onDto#foreach($p in ${params}), p.${p.getName()}()#end)
 #else
 	err = dao.ds.QueryAllRows(sql, onDto#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
@@ -168,7 +168,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #if($use_dto)
 #if(${dto_param} != "")
 	row, err := dao.ds.QueryRow(sql#foreach($param in ${params}), p.${param.getName()}()#end))
-#else	
+#else
 	row, err := dao.ds.QueryRow(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()})
 #end
 	if err != nil {
@@ -210,31 +210,31 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 // Returns the number of affected rows or -1 on error.
 
 #if(${dto_param} != "")
-func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (res int64, err error) {
+func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (rowsAffected int64, err error) {
 #if($crud && $model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
-	res, err = dao.ds.Update("${table_name}", p)
+	rowsAffected, err = dao.ds.Update("${table_name}", p)
 #else
-	res, err = dao.ds.Delete("${table_name}", p)
+	rowsAffected, err = dao.ds.Delete("${table_name}", p)
 #end
 #else
 #sql_var($is_external_sql $sql)
-	res, err = dao.ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
-#end	
+	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
+#end
 	return
 }
 #else ## ---------- not-dto params ----------------------
-func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res int64, err error) {
+func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
 #if($crud && $model != "")
 	p := &${dto_param_type}{
 #foreach($p in $params)
 		$p.getName(): $p.getLowerCamelCaseName(),
-#end	
+#end
 	}
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
-	res, err = dao.ds.Update("${table_name}", p)
+	rowsAffected, err = dao.ds.Update("${table_name}", p)
 #else
-	res, err = dao.ds.Delete("${table_name}", p)
+	rowsAffected, err = dao.ds.Delete("${table_name}", p)
 #end
 	return
 }
@@ -253,9 +253,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	}
 #end
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	res, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
-	res, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
+	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
 #if($mappings.size()>0)
 	if err == nil {
