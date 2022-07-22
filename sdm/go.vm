@@ -213,9 +213,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (res int64, err error) {
 #if($crud && $model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
-    res, err = dao.ds.Update("${table_name}", p)
+	res, err = dao.ds.Update("${table_name}", p)
 #else
-    res, err = dao.ds.Delete("${table_name}", p)
+	res, err = dao.ds.Delete("${table_name}", p)
 #end
 #else
 #sql_var($is_external_sql $sql)
@@ -232,9 +232,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end	
 	}
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
-    res, err = dao.ds.Update("${table_name}", p)
+	res, err = dao.ds.Update("${table_name}", p)
 #else
-    res, err = dao.ds.Delete("${table_name}", p)
+	res, err = dao.ds.Delete("${table_name}", p)
 #end
 	return
 }
