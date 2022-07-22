@@ -17,8 +17,7 @@ func ReturnTaskHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	task := models.Task{TId: inTsk.TId}
-	err = dbal.Db().Take(&task).Error
+	task, err := dbal.NewTasksDao().ReadTask(inTsk.TId)
 	if err == gorm.ErrRecordNotFound {
 		respondWithNotFoundError(ctx, err.Error())
 	} else if err != nil {
@@ -34,10 +33,8 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	// don't fetch comments for list:
-	var tasks []*models.Task // https://gorm.io/docs/query.html
-	err := dbal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
-		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
+	var tasks []*models.Task
+	tasks, err := dbal.NewTasksDao().ReadGroupTasks(uri.GId)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -64,7 +61,7 @@ func TaskCreateHandler(ctx *gin.Context) {
 	currentTime := time.Now().Local()
 	layoutISO := currentTime.Format("2006-01-02")
 	t.TDate = layoutISO
-	err = dbal.Db().Create(&t).Error
+	err = dbal.NewTasksDao().CreateTask(&t)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -78,8 +75,7 @@ func TaskDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	currTask := models.Task{TId: inTsk.TId}
-	err = dbal.Db().Delete(&currTask).Error
+	_, err = dbal.NewTasksDao().DeleteTask(inTsk.TId)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -112,8 +108,8 @@ func TaskUpdateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid Priority: %d", inTask.TPriority))
 		return
 	}
-	t := models.Task{TId: inTsk.TId}
-	err = dbal.Db().Take(&t).Error
+	dao := dbal.NewTasksDao()
+	t, err := dao.ReadTask(inTsk.TId)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -122,7 +118,7 @@ func TaskUpdateHandler(ctx *gin.Context) {
 	t.TPriority = inTask.TPriority
 	t.TDate = inTask.TDate
 	t.TComments = inTask.TComments
-	err = dbal.Db().Save(&t).Error
+	_, err = dao.UpdateTask(t)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

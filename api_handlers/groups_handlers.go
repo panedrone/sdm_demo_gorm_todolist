@@ -18,14 +18,14 @@ func GroupCreateHandler(ctx *gin.Context) {
 	}
 	gr := models.Group{}
 	gr.GName = inGr.GName
-	err = dbal.Db().Create(&gr).Error
+	err = dbal.NewGroupsDao().Create(&gr)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
 	}
 }
 
-func ReturnAllGroupsHandler(ctx *gin.Context) {
+func GroupsReadAllHandler(ctx *gin.Context) {
 	grDao := dbal.NewGroupsDao()
 	groups, err := grDao.GetAllGroupsEx()
 	if err != nil {
@@ -47,14 +47,14 @@ func GroupUpdateHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	gr := models.Group{GId: uri.GId}
-	err = dbal.Db().Take(&gr).Error
+	dao := dbal.NewGroupsDao()
+	gr, err := dao.Read(uri.GId)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
 	}
 	gr.GName = inGroup.GName
-	err = dbal.Db().Save(&gr).Error // https://gorm.io/docs/update.html
+	_, err = dao.Update(gr)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -67,21 +67,19 @@ func GroupDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	gr := models.Group{GId: uri.GId}
-	err := dbal.Db().Delete(&gr).Error // https://gorm.io/docs/delete.html
+	_, err := dbal.NewGroupsDao().Delete(uri.GId)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 	}
 }
 
-func ReturnGroupHandler(ctx *gin.Context) {
+func GroupReadHandler(ctx *gin.Context) {
 	var uri groupUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	group := models.Group{GId: uri.GId}
-	err := dbal.Db().Take(&group).Error
+	group, err := dbal.NewGroupsDao().Read(uri.GId)
 	if err == gorm.ErrRecordNotFound {
 		respondWithNotFoundError(ctx, err.Error())
 	} else if err != nil {

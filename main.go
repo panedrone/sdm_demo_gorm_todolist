@@ -25,11 +25,11 @@ func main() {
 	////////////////////
 	{
 		groups := myRouter.Group("/groups")
-		groups.GET("/", api_handlers.ReturnAllGroupsHandler)
+		groups.GET("/", api_handlers.GroupsReadAllHandler)
 		groups.POST("/", api_handlers.GroupCreateHandler)
 		{
 			group := groups.Group("/:g_id")
-			group.GET("/", api_handlers.ReturnGroupHandler)
+			group.GET("/", api_handlers.GroupReadHandler)
 			group.PUT("/", api_handlers.GroupUpdateHandler)
 			group.DELETE("/", api_handlers.GroupDeleteHandler)
 			{

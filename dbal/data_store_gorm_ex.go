@@ -15,9 +15,9 @@ func (ds *_DS) initDb() (err error) {
 	return
 }
 
-func Db() *gorm.DB {
-	return ds.db
-}
+//func Db() *gorm.DB {
+//	return ds.db
+//}
 
 func OpenDB() error {
 	return ds.Open()
@@ -29,4 +29,8 @@ func CloseDB() error {
 
 func NewGroupsDao() *GroupsDao {
 	return &GroupsDao{ds: ds}
+}
+
+func NewTasksDao() *TasksDao {
+	return &TasksDao{ds: ds}
 }

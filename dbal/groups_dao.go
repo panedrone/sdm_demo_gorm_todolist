@@ -12,7 +12,7 @@ type GroupsDao struct {
 // (C)RUD: groups
 // Generated values are passed to DTO/model.
 
-func (dao *GroupsDao) Crete(p *models.Group) (err error) {
+func (dao *GroupsDao) Create(p *models.Group) (err error) {
 	err = dao.ds.Db().Create(p).Error
 	return
 }

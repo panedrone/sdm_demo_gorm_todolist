@@ -3,7 +3,7 @@
            xsi:noNamespaceSchemaLocation="dao.xsd">
 
     <crud dto="gorm-Group" table="groups">
-        <create method="crete"/>
+        <create method="create"/>
         <read-all method="read_all"/>
         <read method="read"/>
         <update method="update"/>
