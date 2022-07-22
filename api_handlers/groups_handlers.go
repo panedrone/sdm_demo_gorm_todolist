@@ -27,7 +27,7 @@ func GroupCreateHandler(ctx *gin.Context) {
 
 func ReturnAllGroupsHandler(ctx *gin.Context) {
 	grDao := dbal.NewGroupsDao()
-	groups, err := grDao.GetGroupsEx()
+	groups, err := grDao.GetAllGroupsEx()
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

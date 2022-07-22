@@ -2,6 +2,16 @@
 <dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="dao.xsd">
 
-    <query-dto-list method="getGroupsEx" dto="GroupEx" />
+    <crud dto="gorm-Group" table="groups">
+        <create method="crete"/>
+        <read-all method="read_all"/>
+        <read method="read"/>
+        <update method="update"/>
+        <delete method="delete"/>
+    </crud>
+
+    <query-dto-list method="GetAllGroupsEx" dto="GroupEx" />
+
+    <query-dto dto="GroupEx" method="GetGroupEx(g_id)" ref="get_group.sql"/>
 
 </dao-class>

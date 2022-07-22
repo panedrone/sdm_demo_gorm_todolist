@@ -21,6 +21,8 @@ import (
 */
 
 type DataStore interface {
+	Db() *gorm.DB
+
 	Open() (err error)
 	Close() (err error)
 
@@ -65,6 +67,10 @@ type _DS struct {
 	paramPrefix string
 	db          *gorm.DB
 	tx          *gorm.DB
+}
+
+func (ds *_DS) Db() *gorm.DB {
+	return ds.db
 }
 
 func (ds *_DS) isPostgreSQL() bool {

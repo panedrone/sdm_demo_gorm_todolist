@@ -35,7 +35,7 @@ func ReturnGroupTasksHandler(ctx *gin.Context) {
 		return
 	}
 	// don't fetch comments for list:
-	var tasks []models.Task // https://gorm.io/docs/query.html
+	var tasks []*models.Task // https://gorm.io/docs/query.html
 	err := dbal.Db().Table("tasks").Where("g_id = ?", uri.GId).Order("t_id").
 		Select("t_id", "t_date", "t_subject", "t_priority").Find(&tasks).Error
 	if err != nil {
