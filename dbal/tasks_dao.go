@@ -47,3 +47,11 @@ func (dao *TasksDao) DeleteTask(p *models.Task) (rowsAffected int64, err error) 
 	rowsAffected, err = dao.ds.Delete("tasks", p)
 	return
 }
+
+// Returns the number of affected rows or -1 on error.
+
+func (dao *TasksDao) DeleteAllGroupTasks(gId string) (rowsAffected int64, err error) {
+	sql := `delete from tasks where g_id=?`
+	rowsAffected, err = dao.ds.Exec(sql, gId)
+	return
+}

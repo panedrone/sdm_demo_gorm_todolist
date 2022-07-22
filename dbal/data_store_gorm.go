@@ -35,8 +35,8 @@ type DataStore interface {
 	Create(table string, dataObjRef interface{}) (err error)
 	ReadAll(table string, sliceOfDataObjRef interface{}) (err error)
 	Read(table string, dataObjRef interface{}, pk ...interface{}) (err error)
-	Update(table string, dataObjRef interface{}) (RowsAffected int64, err error)
-	Delete(table string, dataObjRef interface{}) (RowsAffected int64, err error)
+	Update(table string, dataObjRef interface{}) (rowsAffected int64, err error)
+	Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error)
 
 	// raw-SQL
 
@@ -183,17 +183,17 @@ func (ds *_DS) Read(table string, dataObjRef interface{}, pk ...interface{}) err
 	return ds.db.Table(table).Take(dataObjRef, pk...).Error
 }
 
-func (ds *_DS) Update(table string, dataObjRef interface{}) (RowsAffected int64, err error) {
+func (ds *_DS) Update(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
 	db := ds.db.Table(table).Save(dataObjRef)
 	err = db.Error
-	RowsAffected = db.RowsAffected
+	rowsAffected = db.RowsAffected
 	return
 }
 
-func (ds *_DS) Delete(table string, dataObjRef interface{}) (RowsAffected int64, err error) {
+func (ds *_DS) Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
 	db := ds.db.Table(table).Delete(dataObjRef)
 	err = db.Error
-	RowsAffected = db.RowsAffected
+	rowsAffected = db.RowsAffected
 	return
 }
 
