@@ -67,7 +67,10 @@ func GroupDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))
 		return
 	}
-	_, err := dbal.NewGroupsDao().Delete(uri.GId)
+	gr := &models.Group{
+		GId: uri.GId,
+	}
+	_, err := dbal.NewGroupsDao().Delete(gr)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 	}

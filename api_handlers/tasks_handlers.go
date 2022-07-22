@@ -75,7 +75,10 @@ func TaskDeleteHandler(ctx *gin.Context) {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	_, err = dbal.NewTasksDao().DeleteTask(inTsk.TId)
+	tsk := &models.Task{
+		TId: inTsk.TId,
+	}
+	_, err = dbal.NewTasksDao().DeleteTask(tsk)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return

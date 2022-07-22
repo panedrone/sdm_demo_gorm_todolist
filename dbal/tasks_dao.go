@@ -13,14 +13,14 @@ type TasksDao struct {
 // Generated values are passed to DTO/model.
 
 func (dao *TasksDao) CreateTask(p *models.Task) (err error) {
-	err = dao.ds.Create(p)
+	err = dao.ds.Create("tasks", p)
 	return
 }
 
 // C(R)UD: tasks
 
 func (dao *TasksDao) ReadTaskList() (res []*models.Task, err error) {
-	err = dao.ds.Read(res)
+	err = dao.ds.ReadAll("tasks", res)
 	return
 }
 
@@ -28,7 +28,7 @@ func (dao *TasksDao) ReadTaskList() (res []*models.Task, err error) {
 
 func (dao *TasksDao) ReadTask(tId int64) (res *models.Task, err error) {
 	res = &models.Task{}
-	err = dao.ds.Read(res, tId)
+	err = dao.ds.Read("tasks", res, tId)
 	return
 }
 
@@ -36,17 +36,14 @@ func (dao *TasksDao) ReadTask(tId int64) (res *models.Task, err error) {
 // Returns the number of affected rows or -1 on error.
 
 func (dao *TasksDao) UpdateTask(p *models.Task) (res int64, err error) {
-	res, err = dao.ds.Update(p)
+	res, err = dao.ds.Update("tasks", p)
 	return
 }
 
 // CRU(D): tasks
 // Returns the number of affected rows or -1 on error.
 
-func (dao *TasksDao) DeleteTask(tId int64) (res int64, err error) {
-	p := &models.Task{
-		TId: tId,
-	}
-	res, err = dao.ds.Delete(p)
+func (dao *TasksDao) DeleteTask(p *models.Task) (res int64, err error) {
+	res, err = dao.ds.Delete("tasks", p)
 	return
 }

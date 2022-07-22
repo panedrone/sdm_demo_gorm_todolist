@@ -32,11 +32,11 @@ type DataStore interface {
 
 	// CRUD
 
-	Create(dataObjRef interface{}) (err error)
-	ReadAll(sliceOfDataObjRef interface{}) (err error)
-	Read(dataObjRef interface{}, pk ...interface{}) (err error)
-	Update(dataObjRef interface{}) (RowsAffected int64, err error)
-	Delete(dataObjRef interface{}) (RowsAffected int64, err error)
+	Create(table string, dataObjRef interface{}) (err error)
+	ReadAll(table string, sliceOfDataObjRef interface{}) (err error)
+	Read(table string, dataObjRef interface{}, pk ...interface{}) (err error)
+	Update(table string, dataObjRef interface{}) (RowsAffected int64, err error)
+	Delete(table string, dataObjRef interface{}) (RowsAffected int64, err error)
 
 	// raw-SQL
 
@@ -171,27 +171,27 @@ func (ds *_DS) Rollback() (err error) {
 
 // CRUD -----------------------------------
 
-func (ds *_DS) Create(dataObjRef interface{}) error {
-	return ds.db.Create(dataObjRef).Error
+func (ds *_DS) Create(table string, dataObjRef interface{}) error {
+	return ds.db.Table(table).Create(dataObjRef).Error
 }
 
-func (ds *_DS) ReadAll(sliceOfDataObjRef interface{}) error {
-	return ds.db.Find(sliceOfDataObjRef).Error
+func (ds *_DS) ReadAll(table string, sliceOfDataObjRef interface{}) error {
+	return ds.db.Table(table).Find(sliceOfDataObjRef).Error
 }
 
-func (ds *_DS) Read(dataObjRef interface{}, pk ...interface{}) error {
-	return ds.db.Take(dataObjRef, pk...).Error
+func (ds *_DS) Read(table string, dataObjRef interface{}, pk ...interface{}) error {
+	return ds.db.Table(table).Take(dataObjRef, pk...).Error
 }
 
-func (ds *_DS) Update(dataObjRef interface{}) (RowsAffected int64, err error) {
-	db := ds.db.Save(dataObjRef)
+func (ds *_DS) Update(table string, dataObjRef interface{}) (RowsAffected int64, err error) {
+	db := ds.db.Table(table).Save(dataObjRef)
 	err = db.Error
 	RowsAffected = db.RowsAffected
 	return
 }
 
-func (ds *_DS) Delete(dataObjRef interface{}) (RowsAffected int64, err error) {
-	db := ds.db.Delete(dataObjRef)
+func (ds *_DS) Delete(table string, dataObjRef interface{}) (RowsAffected int64, err error) {
+	db := ds.db.Table(table).Delete(dataObjRef)
 	err = db.Error
 	RowsAffected = db.RowsAffected
 	return
