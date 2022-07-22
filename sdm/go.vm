@@ -154,9 +154,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 #else
 #if(${dto_param} != "")
-func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)${dto_param} p) (res *${returned_type_name}, err error) {
+func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)${dto_param} p) (res #if($use_dto)*#end${returned_type_name}, err error) {
 #else
-func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res *${returned_type_name}, err error) {
+func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res #if($use_dto)*#end${returned_type_name}, err error) {
 #end
 #if($crud && $model != "")
 	res = &${returned_type_name}{}
