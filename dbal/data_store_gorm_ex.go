@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var ds = &_DS{}
+var _ds = &_DS{} // completely private
 
 func (ds *_DS) initDb() (err error) {
 	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
@@ -16,21 +16,21 @@ func (ds *_DS) initDb() (err error) {
 }
 
 //func Db() *gorm.DB {
-//	return ds.db
+//	return _ds.db
 //}
 
 func OpenDB() error {
-	return ds.Open()
+	return _ds.Open()
 }
 
 func CloseDB() error {
-	return ds.Close()
+	return _ds.Close()
 }
 
 func NewGroupsDao() *GroupsDao {
-	return &GroupsDao{ds: ds}
+	return &GroupsDao{ds: _ds}
 }
 
 func NewTasksDao() *TasksDao {
-	return &TasksDao{ds: ds}
+	return &TasksDao{ds: _ds}
 }
