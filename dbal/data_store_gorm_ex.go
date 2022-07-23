@@ -3,14 +3,14 @@ package dbal
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	//"gorm.io/gorm/logger"
 )
 
-var _ds = &_DS{} // completely private
+var _ds = &_DS{} // completely private for this package
 
 func (ds *_DS) initDb() (err error) {
 	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		//		Logger: logger.Default.LogMode(logger.Info),
 	})
 	return
 }
