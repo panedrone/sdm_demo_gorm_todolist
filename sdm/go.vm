@@ -197,8 +197,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 }
 #end
-#end
-## ======================================================================================
+#end## ======================================================================================
 #elseif($mode=="dao_exec_dml")
 
 #if($method_type == "CREATE")
@@ -226,20 +225,6 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 }
 #else## ---------- not-dto params ----------------------
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
-#if($crud && $model != "")
-	p := &${dto_param_type}{
-#foreach($p in $params)
-		$p.getName(): $p.getLowerCamelCaseName(),
-#end
-	}
-#if ($method_type == "CREATE" || $method_type == "UPDATE")
-	rowsAffected, err = dao.ds.Update("${table_name}", p)
-#else
-	rowsAffected, err = dao.ds.Delete("${table_name}", p)
-#end
-	return
-}
-#else
 #sql_var($is_external_sql $sql)
 #if($mappings.size()>0)
 	errMap := make(map[string]int)
@@ -265,6 +250,5 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 	return
 }
-#end
 #end
 #end
