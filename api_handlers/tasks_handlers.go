@@ -27,7 +27,7 @@ func TaskReadHandler(ctx *gin.Context) {
 	}
 }
 
-func ReturnGroupTasksHandler(ctx *gin.Context) {
+func TasksByGroupReadHandler(ctx *gin.Context) {
 	var uri groupUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid URI: %s", err.Error()))

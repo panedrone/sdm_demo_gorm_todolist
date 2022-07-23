@@ -34,7 +34,7 @@ func main() {
 			group.DELETE("/", h.GroupDeleteHandler)
 			{
 				groupTasks := group.Group("/tasks")
-				groupTasks.GET("/", h.ReturnGroupTasksHandler)
+				groupTasks.GET("/", h.TasksByGroupReadHandler)
 				groupTasks.POST("/", h.TaskCreateHandler)
 			}
 		}
