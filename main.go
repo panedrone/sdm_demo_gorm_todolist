@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"sdm_demo_gorm_todolist/api_handlers"
+	h "sdm_demo_gorm_todolist/api_handlers"
 	"sdm_demo_gorm_todolist/dbal"
 )
 
@@ -14,41 +14,36 @@ func main() {
 		return
 	}
 	defer func() {
-		err = dbal.CloseDB()
+		_ = dbal.CloseDB()
 	}()
-
+	// SetMode before getting gin.New()
 	gin.SetMode(gin.ReleaseMode)
-	myRouter := gin.Default()
+	// use New instead of Default to avoid HTTP logging
+	engine := gin.New()
 	// https://hoohoo.top/blog/20210530112304-golang-tutorial-introduction-gin-html-template-and-how-integration-with-bootstrap/
 	// === panedrone: type "http://localhost:8080/assets/" to render index.html
-	myRouter.Static("/assets", "./assets")
-	////////////////////
+	engine.Static("/assets", "./assets")
 	{
-		groups := myRouter.Group("/groups")
-		groups.GET("/", api_handlers.GroupsReadAllHandler)
-		groups.POST("/", api_handlers.GroupCreateHandler)
+		groups := engine.Group("/groups")
+		groups.GET("/", h.GroupsReadAllHandler)
+		groups.POST("/", h.GroupCreateHandler)
 		{
 			group := groups.Group("/:g_id")
-			group.GET("/", api_handlers.GroupReadHandler)
-			group.PUT("/", api_handlers.GroupUpdateHandler)
-			group.DELETE("/", api_handlers.GroupDeleteHandler)
+			group.GET("/", h.GroupReadHandler)
+			group.PUT("/", h.GroupUpdateHandler)
+			group.DELETE("/", h.GroupDeleteHandler)
 			{
-				tasks := group.Group("/tasks")
-				tasks.GET("/", api_handlers.ReturnGroupTasksHandler)
-				tasks.POST("/", api_handlers.TaskCreateHandler)
+				groupTasks := group.Group("/tasks")
+				groupTasks.GET("/", h.ReturnGroupTasksHandler)
+				groupTasks.POST("/", h.TaskCreateHandler)
 			}
 		}
 	}
-	////////////////////
 	{
-		task := myRouter.Group("/tasks/:t_id")
-		task.GET("", api_handlers.ReturnTaskHandler)
-		task.PUT("", api_handlers.TaskUpdateHandler)
-		task.DELETE("", api_handlers.TaskDeleteHandler)
+		task := engine.Group("/tasks/:t_id")
+		task.GET("", h.TaskReadHandler)
+		task.PUT("", h.TaskUpdateHandler)
+		task.DELETE("", h.TaskDeleteHandler)
 	}
-	// log.Fatal
-	// https://blog.scottlogic.com/2017/02/28/building-a-web-app-with-go.html
-	// log.Fatal(http.ListenAndServe(":8080", myRouter))
-	// https://stackoverflow.com/questions/57354389/how-to-render-static-files-within-gin-router
-	log.Fatal(myRouter.Run(":8080"))
+	log.Fatal(engine.Run(":8080"))
 }

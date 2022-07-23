@@ -10,8 +10,16 @@
         <delete method="delete"/>
     </crud>
 
-    <query-dto-list method="GetAllGroupsEx" dto="GroupEx" />
+    <query-dto-list method="GetAllGroupsEx" dto="GroupEx"/>
 
-    <query-dto dto="GroupEx" method="GetGroupEx(g_id)" ref="get_group.sql"/>
+    <!--    next ones are just for testing:    -->
+
+    <query-dto dto="GroupEx" method="GetGroupEx(int64 g_id)" ref="get_group.sql"/>
+
+    <query-list method="GetGroupExIds()" ref="get_all_groups.sql" return-type="int64"/>
+
+    <query method="GetGroupExId(g_id)" ref="get_group.sql" return-type="int64"/>
+
+    <exec-dml ref="delete from groups where g_id=?" method="deleteGroup(g_id)"/>
 
 </dao-class>

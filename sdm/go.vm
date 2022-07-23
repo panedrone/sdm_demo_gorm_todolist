@@ -207,7 +207,6 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #elseif($method_type == "DELETE")
 // CRU(D): ${table_name}
 #end
-// Returns the number of affected rows or -1 on error.
 
 #if(${dto_param} != "")
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (rowsAffected int64, err error) {

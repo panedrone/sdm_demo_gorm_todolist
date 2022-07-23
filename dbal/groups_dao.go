@@ -34,7 +34,6 @@ func (dao *GroupsDao) Read(gId int64) (res *models.Group, err error) {
 }
 
 // CR(U)D: groups
-// Returns the number of affected rows or -1 on error.
 
 func (dao *GroupsDao) Update(p *models.Group) (rowsAffected int64, err error) {
 	rowsAffected, err = dao.ds.Update("groups", p)
@@ -42,7 +41,6 @@ func (dao *GroupsDao) Update(p *models.Group) (rowsAffected int64, err error) {
 }
 
 // CRU(D): groups
-// Returns the number of affected rows or -1 on error.
 
 func (dao *GroupsDao) Delete(p *models.Group) (rowsAffected int64, err error) {
 	rowsAffected, err = dao.ds.Delete("groups", p)
@@ -68,7 +66,7 @@ func (dao *GroupsDao) GetAllGroupsEx() (res []*models.GroupEx, err error) {
 	return
 }
 
-func (dao *GroupsDao) GetGroupEx(gId string) (res *models.GroupEx, err error) {
+func (dao *GroupsDao) GetGroupEx(gId int64) (res *models.GroupEx, err error) {
 	sql := `select g.*,  
 		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
 		from groups g 
@@ -83,5 +81,40 @@ func (dao *GroupsDao) GetGroupEx(gId string) (res *models.GroupEx, err error) {
 	fromRow(&res.GName, row, "g_name", errMap)
 	fromRow(&res.TasksCount, row, "tasks_count", errMap)
 	err = errMapToErr(errMap)
+	return
+}
+
+func (dao *GroupsDao) GetGroupExIds() (res []int64, err error) {
+	sql := `select g.*,  
+		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
+		from groups g`
+	errMap := make(map[string]int)
+	onRow := func(val interface{}) {
+		var data int64
+		fromVal(&data, val, errMap)
+		res = append(res, data)
+	}
+	err = dao.ds.QueryAll(sql, onRow)
+	if err == nil {
+		err = errMapToErr(errMap)
+	}
+	return
+}
+
+func (dao *GroupsDao) GetGroupExId(gId string) (res int64, err error) {
+	sql := `select g.*,  
+		(select count(*) from tasks where g_id=g.g_id) as tasks_count 
+		from groups g 
+		where g_id=?`
+	r, err := dao.ds.Query(sql, gId)
+	if err == nil {
+		err = assign(&res, r)
+	}
+	return
+}
+
+func (dao *GroupsDao) DeleteGroup(gId string) (rowsAffected int64, err error) {
+	sql := `delete from groups where g_id=?`
+	rowsAffected, err = dao.ds.Exec(sql, gId)
 	return
 }

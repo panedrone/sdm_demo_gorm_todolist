@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func ReturnTaskHandler(ctx *gin.Context) {
+func TaskReadHandler(ctx *gin.Context) {
 	var inTsk taskUri
 	err := ctx.ShouldBindUri(&inTsk)
 	if err != nil {

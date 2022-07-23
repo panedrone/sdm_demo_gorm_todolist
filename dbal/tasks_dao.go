@@ -34,7 +34,6 @@ func (dao *TasksDao) ReadTask(tId int64) (res *models.Task, err error) {
 }
 
 // CR(U)D: tasks
-// Returns the number of affected rows or -1 on error.
 
 func (dao *TasksDao) UpdateTask(p *models.Task) (rowsAffected int64, err error) {
 	rowsAffected, err = dao.ds.Update("tasks", p)
@@ -42,14 +41,11 @@ func (dao *TasksDao) UpdateTask(p *models.Task) (rowsAffected int64, err error) 
 }
 
 // CRU(D): tasks
-// Returns the number of affected rows or -1 on error.
 
 func (dao *TasksDao) DeleteTask(p *models.Task) (rowsAffected int64, err error) {
 	rowsAffected, err = dao.ds.Delete("tasks", p)
 	return
 }
-
-// Returns the number of affected rows or -1 on error.
 
 func (dao *TasksDao) DeleteAllGroupTasks(gId string) (rowsAffected int64, err error) {
 	sql := `delete from tasks where g_id=?`
