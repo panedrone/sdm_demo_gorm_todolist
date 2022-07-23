@@ -11,13 +11,13 @@ import (
 )
 
 func TaskReadHandler(ctx *gin.Context) {
-	var inTsk taskUri
-	err := ctx.ShouldBindUri(&inTsk)
+	var uri taskUri
+	err := ctx.ShouldBindUri(&uri)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	task, err := dbal.NewTasksDao().ReadTask(inTsk.TId)
+	task, err := dbal.NewTasksDao().ReadTask(uri.TId)
 	if err == gorm.ErrRecordNotFound {
 		respondWithNotFoundError(ctx, err.Error())
 	} else if err != nil {
@@ -69,16 +69,16 @@ func TaskCreateHandler(ctx *gin.Context) {
 }
 
 func TaskDeleteHandler(ctx *gin.Context) {
-	var inTsk taskUri
-	err := ctx.ShouldBindUri(&inTsk)
+	var uri taskUri
+	err := ctx.ShouldBindUri(&uri)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
 		return
 	}
-	tsk := &models.Task{
-		TId: inTsk.TId,
+	task := &models.Task{
+		TId: uri.TId,
 	}
-	_, err = dbal.NewTasksDao().DeleteTask(tsk)
+	_, err = dbal.NewTasksDao().DeleteTask(task)
 	if err != nil {
 		respondWith500(ctx, err.Error())
 		return
@@ -86,10 +86,16 @@ func TaskDeleteHandler(ctx *gin.Context) {
 }
 
 func TaskUpdateHandler(ctx *gin.Context) {
-	var inTsk taskUri
-	err := ctx.ShouldBindUri(&inTsk)
+	var uri taskUri
+	err := ctx.ShouldBindUri(&uri)
 	if err != nil {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid JSON: %s", err.Error()))
+		return
+	}
+	dao := dbal.NewTasksDao()
+	t, err := dao.ReadTask(uri.TId)
+	if err != nil {
+		respondWithBadRequestError(ctx, err.Error())
 		return
 	}
 	var inTask models.Task
@@ -109,12 +115,6 @@ func TaskUpdateHandler(ctx *gin.Context) {
 	}
 	if inTask.TPriority <= 0 {
 		respondWithBadRequestError(ctx, fmt.Sprintf("Invalid Priority: %d", inTask.TPriority))
-		return
-	}
-	dao := dbal.NewTasksDao()
-	t, err := dao.ReadTask(inTsk.TId)
-	if err != nil {
-		respondWith500(ctx, err.Error())
 		return
 	}
 	t.TSubject = inTask.TSubject
